@@ -41,6 +41,9 @@ const findCardByIdAndDelete = async (req, res) => {
     if (error.message === 'NotFound') {
       return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Карточка с указанным _id не найдена'].join(' - ') });
     }
+    if (error.name === 'CastError') {
+      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для удаления карточки'].join(' - ') });
+    }
     return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
   }
 };
@@ -58,11 +61,11 @@ const likeCard = async (req, res) => {
     }
     return res.send({ data: card });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.stasus(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для постановки лайка.'].join(' - ') });
-    }
     if (error.message === 'NotFound') {
       return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Передан несуществующий id карточки.'].join(' - ') });
+    }
+    if (error.name === 'CastError') {
+      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для постановки лайка'].join(' - ') });
     }
     return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
   }
@@ -81,11 +84,11 @@ const dislikeCard = async (req, res) => {
     }
     return res.send({ data: card });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.stasus(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для снятия лайка.'].join(' - ') });
-    }
     if (error.message === 'NotFound') {
       return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Передан несуществующий id карточки.'].join(' - ') });
+    }
+    if (error.name === 'CastError') {
+      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для снятия лайка'].join(' - ') });
     }
     return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
   }

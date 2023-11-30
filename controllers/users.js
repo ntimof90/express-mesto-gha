@@ -38,7 +38,10 @@ const findUserById = async (req, res) => {
     return res.send({ data: user });
   } catch (error) {
     if (error.message === 'NotFound') {
-      return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Пользователь по указанному _id не найден'].join(' - ') });
+      return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Пользователь по указанному id не найден'].join(' - ') });
+    }
+    if (error.name === 'CastError') {
+      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные id'].join(' - ') });
     }
     return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
   }
@@ -46,17 +49,22 @@ const findUserById = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.user._id, req.body, { new: true });
+    const { name, about } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true, runValidators: true },
+    );
     if (!user) {
       throw new Error('NotFound');
     }
     return res.send({ data: user });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.stasus(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные при обновлении профиля.'].join(' - ') });
-    }
     if (error.message === 'NotFound') {
       return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Пользователь по указанному _id не найден'].join(' - ') });
+    }
+    if (error.name === 'ValidationError') {
+      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные при обновлении профиля'].join(' - ') });
     }
     return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
   }
@@ -64,7 +72,12 @@ const updateUserProfile = async (req, res) => {
 
 const updateUserAvatar = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.user._id, req.body, { new: true });
+    const { avatar } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true, runValidators: true },
+    );
     if (!user) {
       throw new Error('NotFound');
     }
@@ -80,10 +93,15 @@ const updateUserAvatar = async (req, res) => {
   }
 };
 
+const errorHandler = (req, res) => {
+  res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Страница не найдена'].join(' - ') });
+}
+
 module.exports = {
   createUser,
   findUsers,
   findUserById,
   updateUserProfile,
   updateUserAvatar,
+  errorHandler,
 };
