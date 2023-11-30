@@ -93,15 +93,10 @@ const updateUserAvatar = async (req, res) => {
   }
 };
 
-const errorHandler = (req, res) => {
-  res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Страница не найдена'].join(' - ') });
-}
-
 module.exports = {
   createUser,
   findUsers,
   findUserById,
   updateUserProfile,
   updateUserAvatar,
-  errorHandler,
 };
