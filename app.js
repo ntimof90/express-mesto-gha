@@ -25,6 +25,4 @@ app.use('/', userRouter);
 
 app.use('/', cardRouter);
 
-app.listen(PORT, () => {
-  console.log(`app listlllllening on port ${PORT}`);
-});
+app.listen(PORT, () => {});
