@@ -33,6 +33,7 @@ const createUser = async (req, res, next) => {
       about,
       avatar,
     });
+    user.password = undefined;
     return res.send({ data: user });
   } catch (error) {
     let e = error;
