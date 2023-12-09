@@ -2,7 +2,7 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 
-const { celebrate, Joi, isCelebrateError } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 
 const userRouter = require('./routes/users');
 
@@ -11,8 +11,6 @@ const cardRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 
 const NotFoundError = require('./errors/not-found-error');
-
-const ValidationError = require('./errors/validation-error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -48,13 +46,7 @@ app.use((req, res, next) => {
   next(e);
 });
 
-app.use((error, req, res, next) => {
-  let e = error;
-  if (isCelebrateError(error)) {
-    e = new ValidationError('Переданы некорректные данные');
-  }
-  next(e);
-});
+app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
