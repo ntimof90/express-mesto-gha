@@ -2,11 +2,17 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 
+const { celebrate, Joi, isCelebrateError } = require('celebrate');
+
 const userRouter = require('./routes/users');
 
 const cardRouter = require('./routes/cards');
 
-const ERROR_NOT_FOUND = 404;
+const { login, createUser } = require('./controllers/users');
+
+const NotFoundError = require('./errors/not-found-error');
+
+const ValidationError = require('./errors/validation-error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -15,22 +21,48 @@ mongoose.connect('mongodb://localhost:27017/mestodb', { family: 4 });
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6563b205a5d6f1b426304fa6',
-  };
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
 
-  next();
-});
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    // eslint-disable-next-line no-useless-escape
+    avatar: Joi.string().regex(/^(http:\/\/|https:\/\/)(w{3}\.)?[a-zA-Z0-9-]{2,}\.[a-zA-Z]{2,}\/?[a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/i),
+  }),
+}), createUser);
 
 app.use('/', userRouter);
 
 app.use('/', cardRouter);
 
-app.use((req, res) => {
-  res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Страница не найдена'].join(' - ') });
+app.use((req, res, next) => {
+  const e = new NotFoundError('Страница не найдена');
+  next(e);
+});
+
+app.use((error, req, res, next) => {
+  let e = error;
+  if (isCelebrateError(error)) {
+    e = new ValidationError('Переданы некорректные данные');
+  }
+  next(e);
+});
+
+// eslint-disable-next-line no-unused-vars
+app.use((error, req, res, next) => {
+  const { statusCode = 500, message = 'На сервере произошла ошибка' } = error;
+  res.status(statusCode).send({ message: [statusCode, message].join(' - ') });
 });
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`app listening on port ${PORT}`);
 });

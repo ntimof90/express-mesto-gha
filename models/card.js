@@ -10,6 +10,14 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator(value) {
+        // eslint-disable-next-line no-useless-escape
+        const regex = /^(http:\/\/|https:\/\/)(w{3}\.)?[a-zA-Z0-9-.]{2,}\.[a-zA-Z]{2,}\/?[a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/i;
+        return regex.test(value);
+      },
+      message: 'Неверный url!',
+    },
   },
   owner: {
     ref: 'user',
@@ -19,7 +27,7 @@ const cardSchema = new mongoose.Schema({
   likes: [{
     ref: 'user',
     type: mongoose.Schema.Types.ObjectId,
-    default: null,
+    default: [],
   }],
   createdAt: {
     type: Date,

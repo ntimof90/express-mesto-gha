@@ -1,54 +1,47 @@
 const Card = require('../models/card');
 
-const ERROR_VALIDATION = 400;
+const NotFoundError = require('../errors/not-found-error');
 
-const ERROR_NOT_FOUND = 404;
+const ForbiddenError = require('../errors/forbidden-error');
 
-const ERROR_DEFAULT = 500;
-
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const owner = req.user._id;
     const card = await Card.create({ name, link, owner });
     return res.send({ data: card });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные при создании карточки'].join(' - ') });
-    }
-    return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
+    return next(error);
   }
 };
 
-const findCards = async (req, res) => {
+const findCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
     return res.send({ data: cards });
   } catch (error) {
-    return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
+    return next(error);
   }
 };
 
-const findCardByIdAndDelete = async (req, res) => {
+const findCardByIdAndDelete = async (req, res, next) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findByIdAndDelete(cardId);
+    let card = await Card.findOneAndDelete({ _id: cardId, owner: req.user._id });
     if (!card) {
-      throw new Error('NotFound');
+      card = await Card.findById(cardId);
+      if (!card) {
+        throw new NotFoundError('Карточка с указанным id не найдена');
+      }
+      throw new ForbiddenError('У вас нет прав на удаление чужой карточки');
     }
     return res.send({ data: card });
   } catch (error) {
-    if (error.message === 'NotFound') {
-      return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Карточка с указанным _id не найдена'].join(' - ') });
-    }
-    if (error.name === 'CastError') {
-      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для удаления карточки'].join(' - ') });
-    }
-    return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
+    return next(error);
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findByIdAndUpdate(
@@ -57,21 +50,15 @@ const likeCard = async (req, res) => {
       { new: true },
     );
     if (!card) {
-      throw new Error('NotFound');
+      throw new NotFoundError('Передан несуществующий id карточки');
     }
     return res.send({ data: card });
   } catch (error) {
-    if (error.message === 'NotFound') {
-      return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Передан несуществующий id карточки.'].join(' - ') });
-    }
-    if (error.name === 'CastError') {
-      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для постановки лайка'].join(' - ') });
-    }
-    return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
+    return next(error);
   }
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findByIdAndUpdate(
@@ -80,17 +67,11 @@ const dislikeCard = async (req, res) => {
       { new: true },
     );
     if (!card) {
-      throw new Error('NotFound');
+      throw new NotFoundError('Передан несуществующий id карточки');
     }
     return res.send({ data: card });
   } catch (error) {
-    if (error.message === 'NotFound') {
-      return res.status(ERROR_NOT_FOUND).send({ message: [ERROR_NOT_FOUND, 'Передан несуществующий id карточки.'].join(' - ') });
-    }
-    if (error.name === 'CastError') {
-      return res.status(ERROR_VALIDATION).send({ message: [ERROR_VALIDATION, 'Переданы некорректные данные для снятия лайка'].join(' - ') });
-    }
-    return res.status(ERROR_DEFAULT).send({ message: [ERROR_DEFAULT, 'На сервере произошла ошибка'].join(' - ') });
+    return next(error);
   }
 };
 
