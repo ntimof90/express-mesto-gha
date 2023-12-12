@@ -17,7 +17,7 @@ const app = express();
 const allowedCors = [
   'https://coast.students.nomoredomainsmonster.ru',
   'https://coast.students.nomoredomainsmonster.ru',
-  'localhost:3000',
+  'http://localhost:3000',
 ];
 
 mongoose.connect('mongodb://localhost:27017/mestodb', { family: 4 });
