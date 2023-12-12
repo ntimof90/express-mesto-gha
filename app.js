@@ -14,10 +14,29 @@ const NotFoundError = require('./errors/not-found-error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
+const allowedCors = [
+  'https://coast.students.nomoredomainsmonster.ru',
+  'https://coast.students.nomoredomainsmonster.ru',
+  'localhost:3000',
+];
 
 mongoose.connect('mongodb://localhost:27017/mestodb', { family: 4 });
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+  const { method } = req;
+  const requestHeaders = req.headers['access-control-request-headers'];
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', requestHeaders);
+    return res.end();
+  }
+  return next();
+});
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
