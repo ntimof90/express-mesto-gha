@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const AuthorizationError = require('../errors/authorization-error');
 
-const key = '59b424d00ae462ad5762ace0fe99584c56695ef156beaddd0bdb9ba4b7e480de';
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
   let payload;
@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
       throw new AuthorizationError('Неверный логин и пароль');
     }
     const token = authorization.replace('Bearer ', '');
-    payload = jwt.verify(token, key);
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (error) {
     let e = error;
     if (error.name === 'JsonWebTokenError') {

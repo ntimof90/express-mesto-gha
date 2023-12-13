@@ -14,7 +14,7 @@ const NotFoundError = require('../errors/not-found-error');
 
 const MONGODB_DUPLICATE_ERROR_CODE = 11000;
 
-const key = '59b424d00ae462ad5762ace0fe99584c56695ef156beaddd0bdb9ba4b7e480de';
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const createUser = async (req, res, next) => {
   try {
@@ -59,7 +59,7 @@ const login = async (req, res, next) => {
     }
     const token = jwt.sign(
       { _id: user._id },
-      key,
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
     return res.send({ token });
