@@ -8,6 +8,8 @@ const { celebrate, Joi, errors } = require('celebrate');
 
 const cors = require('cors');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const userRouter = require('./routes/users');
 
 const cardRouter = require('./routes/cards');
@@ -38,6 +40,8 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
+app.use(requestLogger);
+
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -64,6 +68,8 @@ app.use((req, res, next) => {
   const e = new NotFoundError('Страница не найдена');
   next(e);
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
