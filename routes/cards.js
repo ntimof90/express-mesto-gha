@@ -12,7 +12,7 @@ const {
 
 const auth = require('../middlewares/auth');
 
-router.post('/cards', auth, celebrate({
+router.post('/', auth, celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     // eslint-disable-next-line no-useless-escape
@@ -20,21 +20,21 @@ router.post('/cards', auth, celebrate({
   }),
 }), createCard);
 
-router.get('/cards', auth, findCards);
+router.get('/', auth, findCards);
 
-router.delete('/cards/:cardId', auth, celebrate({
+router.delete('/:cardId', auth, celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex().required(),
   }),
 }), findCardByIdAndDelete);
 
-router.put('/cards/:cardId/likes', auth, celebrate({
+router.put('/:cardId/likes', auth, celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex().required(),
   }),
 }), likeCard);
 
-router.delete('/cards/:cardId/likes', auth, celebrate({
+router.delete('/:cardId/likes', auth, celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex().required(),
   }),

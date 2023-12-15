@@ -60,9 +60,9 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('/', userRouter);
+app.use('/users', userRouter);
 
-app.use('/', cardRouter);
+app.use('/cards', cardRouter);
 
 app.use((req, res, next) => {
   const e = new NotFoundError('Страница не найдена');
