@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
+const validator = require('../middlewares/validator');
 const {
   createCard,
   findCards,
@@ -8,32 +8,14 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 
-router.post('/', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    // eslint-disable-next-line no-useless-escape
-    link: Joi.string().required().regex(/^(http:\/\/|https:\/\/)(w{3}\.)?[a-zA-Z0-9-.]{2,}\.[a-zA-Z]{2,}\/?[a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/i),
-  }),
-}), createCard);
+router.post('/', validator.createCard, createCard);
 
 router.get('/', findCards);
 
-router.delete('/:cardId', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().length(24).hex().required(),
-  }),
-}), findCardByIdAndDelete);
+router.delete('/:cardId', validator.findCardByIdAndDelete, findCardByIdAndDelete);
 
-router.put('/:cardId/likes', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().length(24).hex().required(),
-  }),
-}), likeCard);
+router.put('/:cardId/likes', validator.likeDislikeCard, likeCard);
 
-router.delete('/:cardId/likes', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().length(24).hex().required(),
-  }),
-}), dislikeCard);
+router.delete('/:cardId/likes', validator.likeDislikeCard, dislikeCard);
 
 module.exports = router;

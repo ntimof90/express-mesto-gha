@@ -5,8 +5,8 @@ const { errors } = require('celebrate');
 const cors = require('cors');
 const { PORT, MONGO_URL, allowedCors } = require('./config');
 
-const { createUserValidator, loginValidator } = require('./middlewares/validator');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const validator = require('./middlewares/validator');
 const errorHandler = require('./middlewares/errorHandler');
 
 const router = require('./routes');
@@ -30,9 +30,9 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', loginValidator, login);
+app.post('/signin', validator.login, login);
 
-app.post('/signup', createUserValidator, createUser);
+app.post('/signup', validator.createUser, createUser);
 
 app.use('/', router);
 
