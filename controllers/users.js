@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 
 const jwt = require('jsonwebtoken');
 
+const { JWT_SECRET } = require('../config');
+
 const User = require('../models/user');
 
 const ValidationError = require('../errors/validation-error');
@@ -13,8 +15,6 @@ const DbConflictError = require('../errors/db-conflict-error');
 const NotFoundError = require('../errors/not-found-error');
 
 const MONGODB_DUPLICATE_ERROR_CODE = 11000;
-
-const { NODE_ENV, JWT_SECRET } = process.env;
 
 const createUser = async (req, res, next) => {
   try {
@@ -59,7 +59,7 @@ const login = async (req, res, next) => {
     }
     const token = jwt.sign(
       { _id: user._id },
-      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+      JWT_SECRET,
       { expiresIn: '7d' },
     );
     return res.send({ token });

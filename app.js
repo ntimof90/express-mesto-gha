@@ -2,11 +2,11 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 
-require('dotenv').config();
-
 const { celebrate, Joi, errors } = require('celebrate');
 
 const cors = require('cors');
+
+const { PORT, MONGO_URL } = require('./config');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
@@ -23,8 +23,6 @@ const allowedCors = [
   'http://coast.students.nomoredomainsmonster.ru',
   'http://localhost:3000',
 ];
-
-const { PORT, MONGO_URL } = process.env;
 
 const app = express();
 
