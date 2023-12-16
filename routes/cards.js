@@ -1,7 +1,5 @@
 const router = require('express').Router();
-
 const { celebrate, Joi } = require('celebrate');
-
 const {
   createCard,
   findCards,
@@ -10,9 +8,7 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 
-const auth = require('../middlewares/auth');
-
-router.post('/', auth, celebrate({
+router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     // eslint-disable-next-line no-useless-escape
@@ -20,21 +16,21 @@ router.post('/', auth, celebrate({
   }),
 }), createCard);
 
-router.get('/', auth, findCards);
+router.get('/', findCards);
 
-router.delete('/:cardId', auth, celebrate({
+router.delete('/:cardId', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex().required(),
   }),
 }), findCardByIdAndDelete);
 
-router.put('/:cardId/likes', auth, celebrate({
+router.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex().required(),
   }),
 }), likeCard);
 
-router.delete('/:cardId/likes', auth, celebrate({
+router.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex().required(),
   }),

@@ -1,28 +1,13 @@
 const express = require('express');
 
 const mongoose = require('mongoose');
-
 const { celebrate, Joi, errors } = require('celebrate');
-
 const cors = require('cors');
-
-const { PORT, MONGO_URL } = require('./config');
-
+const { PORT, MONGO_URL, allowedCors } = require('./config');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
-const userRouter = require('./routes/users');
-
-const cardRouter = require('./routes/cards');
-
+const router = require('./routes');
 const { login, createUser } = require('./controllers/users');
-
 const NotFoundError = require('./errors/not-found-error');
-
-const allowedCors = [
-  'https://coast.students.nomoredomainsmonster.ru',
-  'http://coast.students.nomoredomainsmonster.ru',
-  'http://localhost:3000',
-];
 
 const app = express();
 
@@ -58,9 +43,7 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('/users', userRouter);
-
-app.use('/cards', cardRouter);
+app.use('/', router);
 
 app.use((req, res, next) => {
   const e = new NotFoundError('Страница не найдена');
