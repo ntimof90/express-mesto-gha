@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const { celebrate, Joi } = require('celebrate');
+const { findUserByIdValidator, updateUserProfileValidator, updateUserAvatarValidator } = require('../middlewares/validator');
 
 const {
   findUsers,
@@ -14,24 +14,10 @@ router.get('/', findUsers);
 
 router.get('/me', findUserProfile);
 
-router.get('/:userId', celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().length(24).hex().required(),
-  }),
-}), findUserById);
+router.get('/:userId', findUserByIdValidator, findUserById);
 
-router.patch('/me', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    about: Joi.string().min(2).max(30).required(),
-  }),
-}), updateUserProfile);
+router.patch('/me', updateUserProfileValidator, updateUserProfile);
 
-router.patch('/me/avatar', celebrate({
-  body: Joi.object().keys({
-    // eslint-disable-next-line no-useless-escape
-    avatar: Joi.string().required().regex(/^(http:\/\/|https:\/\/)(w{3}\.)?[a-zA-Z0-9-.]{2,}\.[a-zA-Z]{2,}\/?[a-zA-Z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/i),
-  }),
-}), updateUserAvatar);
+router.patch('/me/avatar', updateUserAvatarValidator, updateUserAvatar);
 
 module.exports = router;
