@@ -7,7 +7,7 @@ const { PORT, MONGO_URL, allowedCors } = require('./config');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const validator = require('./middlewares/validator');
-const errorHandler = require('./middlewares/errorHandler');
+const errorHandler = require('./middlewares/error-handler');
 
 const router = require('./routes');
 

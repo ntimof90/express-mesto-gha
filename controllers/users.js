@@ -77,10 +77,9 @@ const findUsers = async (req, res, next) => {
   }
 };
 
-const findUserById = async (req, res, next) => {
+const findById = async (id, res, next) => {
   try {
-    const { userId } = req.params;
-    const user = await User.findById(userId);
+    const user = await User.findById(id);
     if (!user) {
       throw new NotFoundError('Пользователь по указанному id не найден');
     }
@@ -90,17 +89,39 @@ const findUserById = async (req, res, next) => {
   }
 };
 
-const findUserProfile = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      throw new NotFoundError('Пользователь по указанному id не найден');
-    }
-    return res.send({ data: user });
-  } catch (error) {
-    return next(error);
-  }
+const findUserById = (req, res, next) => {
+  const { userId } = req.params;
+  return findById(userId, res, next);
 };
+
+const findUserProfile = (req, res, next) => {
+  return findById(req.user._id, res, next);
+};
+
+// const findUserById = async (req, res, next) => {
+//   try {
+//     const { userId } = req.params;
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       throw new NotFoundError('Пользователь по указанному id не найден');
+//     }
+//     return res.send({ data: user });
+//   } catch (error) {
+//     return next(error);
+//   }
+// };
+
+// const findUserProfile = async (req, res, next) => {
+//   try {
+//     const user = await User.findById(req.user._id);
+//     if (!user) {
+//       throw new NotFoundError('Пользователь по указанному id не найден');
+//     }
+//     return res.send({ data: user });
+//   } catch (error) {
+//     return next(error);
+//   }
+// };
 
 const updateUserProfile = async (req, res, next) => {
   try {
