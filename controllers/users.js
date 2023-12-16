@@ -89,14 +89,9 @@ const findById = async (id, res, next) => {
   }
 };
 
-const findUserById = (req, res, next) => {
-  const { userId } = req.params;
-  return findById(userId, res, next);
-};
+const findUserById = (req, res, next) => findById(req.params.userId, res, next);
 
-const findUserProfile = (req, res, next) => {
-  return findById(req.user._id, res, next);
-};
+const findUserProfile = (req, res, next) => findById(req.user._id, res, next);
 
 // const findUserById = async (req, res, next) => {
 //   try {
